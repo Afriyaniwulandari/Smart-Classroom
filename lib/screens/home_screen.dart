@@ -23,119 +23,196 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
+  // Custom color scheme
+  static const Color primaryColor = Color(0xFF4A90E2);
+  static const Color secondaryColor = Color(0xFF7B68EE);
+  static const Color backgroundColor = Color(0xFFF5F7FA);
+
   Widget _buildHomeTab() {
     final authProvider = Provider.of<AuthProvider>(context);
     final user = authProvider.user;
 
+    // Define features based on user role
+    List<Map<String, dynamic>> features = [
+      {
+        'title': 'View Classes',
+        'icon': Icons.class_,
+        'color': Colors.blue.shade600,
+        'onTap': () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const ClassesScreen()),
+        ),
+      },
+      {
+        'title': 'AI Recommendations',
+        'icon': Icons.lightbulb_outline,
+        'color': Colors.orange.shade600,
+        'onTap': () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const RecommendationsScreen()),
+        ),
+      },
+      {
+        'title': 'Digital Library',
+        'icon': Icons.library_books,
+        'color': Colors.green.shade600,
+        'onTap': () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const DigitalLibraryScreen()),
+        ),
+      },
+    ];
+
+    // Add student-specific features
+    if (user?.role == 'student') {
+      features.addAll([
+        {
+          'title': 'My Dashboard',
+          'icon': Icons.dashboard,
+          'color': Colors.purple.shade600,
+          'onTap': () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const StudentDashboardScreen()),
+          ),
+        },
+        {
+          'title': 'View Attendance',
+          'icon': Icons.history,
+          'color': Colors.teal.shade600,
+          'onTap': () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const AttendanceHistoryScreen()),
+          ),
+        },
+        {
+          'title': 'Scan QR Code',
+          'icon': Icons.qr_code_scanner,
+          'color': Colors.red.shade600,
+          'onTap': () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const QrScannerScreen()),
+          ),
+        },
+      ]);
+    }
+
+    // Add teacher-specific features
+    if (user?.role == 'teacher') {
+      features.add({
+        'title': 'Teacher Dashboard',
+        'icon': Icons.school,
+        'color': Colors.indigo.shade600,
+        'onTap': () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const TeacherDashboardScreen()),
+        ),
+      });
+    }
+
     return Stack(
       children: [
-        SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Welcome, ${user?.name ?? 'User'}!',
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text('Role: ${user?.role ?? 'Unknown'}'),
-              const SizedBox(height: 32),
-
-              // Common buttons for all users
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const ClassesScreen()),
-                  );
-                },
-                child: const Text('View Classes'),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const RecommendationsScreen()),
-                  );
-                },
-                child: const Text('AI Recommendations'),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const DigitalLibraryScreen()),
-                  );
-                },
-                icon: const Icon(Icons.library_books),
-                label: const Text('Digital Library'),
-              ),
-
-              // Student-specific buttons
-              if (user?.role == 'student') ...[
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const StudentDashboardScreen()),
-                    );
-                  },
-                  icon: const Icon(Icons.dashboard),
-                  label: const Text('My Dashboard'),
+        Container(
+          color: backgroundColor,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Welcome Card
+                Card(
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [primaryColor, secondaryColor],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Welcome back, ${user?.name ?? 'User'}!',
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Role: ${user?.role ?? 'Unknown'}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white70,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ],
+                const SizedBox(height: 24),
 
-              // Student-specific buttons (continued)
-              if (user?.role == 'student') ...[
-                const SizedBox(height: 32),
-                const Text(
-                  'Attendance',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                // Features Grid
+                Text(
+                  'Quick Actions',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
                 ),
                 const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const AttendanceHistoryScreen()),
-                    );
-                  },
-                  icon: const Icon(Icons.history),
-                  label: const Text('View My Attendance'),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const QrScannerScreen()),
-                    );
-                  },
-                  icon: const Icon(Icons.qr_code_scanner),
-                  label: const Text('Scan QR Code'),
+                GridView.count(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: features.map((feature) => _buildFeatureCard(feature)).toList(),
                 ),
               ],
-
-              // Teacher-specific section
-              if (user?.role == 'teacher') ...[
-                const SizedBox(height: 32),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const TeacherDashboardScreen()),
-                    );
-                  },
-                  child: const Text('View Teacher Dashboard'),
-                ),
-              ],
-
-              const SizedBox(height: 32),
-              const Text('Use these credentials to test:'),
-              const Text('Student: student@example.com / password123'),
-              const Text('Teacher: teacher@example.com / password123'),
-            ],
+            ),
           ),
         ),
         const VoiceAssistantOverlay(),
       ],
+    );
+  }
+
+  Widget _buildFeatureCard(Map<String, dynamic> feature) {
+    return Card(
+      elevation: 6,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: feature['onTap'],
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                feature['icon'],
+                size: 48,
+                color: feature['color'],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                feature['title'],
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
