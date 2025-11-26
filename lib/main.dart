@@ -74,6 +74,7 @@ class _MyAppState extends State<MyApp> {
 
         return MaterialApp(
           title: 'Smart Classroom',
+          debugShowCheckedModeBanner: false,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
             useMaterial3: true,
