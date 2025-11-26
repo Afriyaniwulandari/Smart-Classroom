@@ -1,5 +1,7 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:smart_classroom/firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/class_provider.dart';
 import 'providers/live_class_provider.dart';
@@ -14,7 +16,8 @@ import 'providers/library_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 
-void main() {
+void main() async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
     MultiProvider(
       providers: [
@@ -53,7 +56,10 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _initializeApp() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+    final notificationProvider = Provider.of<NotificationProvider>(
+      context,
+      listen: false,
+    );
 
     await authProvider.initializeAuth();
     await notificationProvider.initialize();
@@ -66,9 +72,7 @@ class _MyAppState extends State<MyApp> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const MaterialApp(
-            home: Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            ),
+            home: Scaffold(body: Center(child: CircularProgressIndicator())),
           );
         }
 
@@ -81,7 +85,9 @@ class _MyAppState extends State<MyApp> {
           ),
           home: Consumer<AuthProvider>(
             builder: (context, auth, _) {
-              return auth.isAuthenticated ? const HomeScreen() : const LoginScreen();
+              return auth.isAuthenticated
+                  ? const HomeScreen()
+                  : const LoginScreen();
             },
           ),
           routes: {
@@ -93,4 +99,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-

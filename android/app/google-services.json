@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "324497999858",
+    "project_id": "flutter-firebase-app-a7f68",
+    "storage_bucket": "flutter-firebase-app-a7f68.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:324497999858:android:96dc125c6fb778bdaa8d6b",
+        "android_client_info": {
+          "package_name": "com.example.smart_classroom"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgIIz-sPSgexgEV93HOkFwArg18P0rdM0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
