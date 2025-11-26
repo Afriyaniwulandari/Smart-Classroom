@@ -27,6 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
   static const Color primaryColor = Color(0xFF4A90E2);
   static const Color secondaryColor = Color(0xFF7B68EE);
   static const Color backgroundColor = Color(0xFFF5F7FA);
+  static const List<Color> pastelBlueGradient = [Color(0xFFB3E5FC), Color(0xFF81D4FA)];
+  static const List<Color> pastelPinkGradient = [Color(0xFFF8BBD9), Color(0xFFF48FB1)];
 
   Widget _buildHomeTab() {
     final authProvider = Provider.of<AuthProvider>(context);
@@ -37,7 +39,8 @@ class _HomeScreenState extends State<HomeScreen> {
       {
         'title': 'View Classes',
         'icon': Icons.class_,
-        'color': Colors.blue.shade600,
+        'iconColor': Colors.white,
+        'gradientColors': pastelBlueGradient,
         'onTap': () => Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const ClassesScreen()),
         ),
@@ -45,7 +48,8 @@ class _HomeScreenState extends State<HomeScreen> {
       {
         'title': 'AI Recommendations',
         'icon': Icons.lightbulb_outline,
-        'color': Colors.orange.shade600,
+        'iconColor': Colors.white,
+        'gradientColors': pastelPinkGradient,
         'onTap': () => Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const RecommendationsScreen()),
         ),
@@ -53,7 +57,8 @@ class _HomeScreenState extends State<HomeScreen> {
       {
         'title': 'Digital Library',
         'icon': Icons.library_books,
-        'color': Colors.green.shade600,
+        'iconColor': Colors.white,
+        'gradientColors': pastelBlueGradient,
         'onTap': () => Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const DigitalLibraryScreen()),
         ),
@@ -66,7 +71,8 @@ class _HomeScreenState extends State<HomeScreen> {
         {
           'title': 'My Dashboard',
           'icon': Icons.dashboard,
-          'color': Colors.purple.shade600,
+          'iconColor': Colors.white,
+          'gradientColors': pastelPinkGradient,
           'onTap': () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const StudentDashboardScreen()),
           ),
@@ -74,7 +80,8 @@ class _HomeScreenState extends State<HomeScreen> {
         {
           'title': 'View Attendance',
           'icon': Icons.history,
-          'color': Colors.teal.shade600,
+          'iconColor': Colors.white,
+          'gradientColors': pastelBlueGradient,
           'onTap': () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const AttendanceHistoryScreen()),
           ),
@@ -82,7 +89,8 @@ class _HomeScreenState extends State<HomeScreen> {
         {
           'title': 'Scan QR Code',
           'icon': Icons.qr_code_scanner,
-          'color': Colors.red.shade600,
+          'iconColor': Colors.white,
+          'gradientColors': pastelPinkGradient,
           'onTap': () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const QrScannerScreen()),
           ),
@@ -95,7 +103,8 @@ class _HomeScreenState extends State<HomeScreen> {
       features.add({
         'title': 'Teacher Dashboard',
         'icon': Icons.school,
-        'color': Colors.indigo.shade600,
+        'iconColor': Colors.white,
+        'gradientColors': pastelBlueGradient,
         'onTap': () => Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const TeacherDashboardScreen()),
         ),
@@ -190,6 +199,14 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: feature['onTap'],
         borderRadius: BorderRadius.circular(12),
         child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: feature['gradientColors'],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
           padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -197,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Icon(
                 feature['icon'],
                 size: 48,
-                color: feature['color'],
+                color: feature['iconColor'],
               ),
               const SizedBox(height: 12),
               Text(
@@ -205,7 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: Colors.white,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -303,8 +320,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ],
       type: BottomNavigationBarType.fixed,
-      selectedItemColor: Theme.of(context).primaryColor,
-      unselectedItemColor: Colors.grey,
+      selectedItemColor: const Color(0xFF81D4FA), // Pastel blue
+      unselectedItemColor: const Color(0xFFF48FB1), // Pastel pink
+      backgroundColor: const Color(0xFFF5F7FA), // Light background for enhanced appeal
     );
   }
 
