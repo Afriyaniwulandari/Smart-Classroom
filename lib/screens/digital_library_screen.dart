@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 import '../models/library_item.dart';
 import '../providers/library_provider.dart';
 
+const Color pastelBlue = Color(0xFFAEC6CF);
+const Color pastelPink = Color(0xFFFFB6C1);
+
 class DigitalLibraryScreen extends StatefulWidget {
   const DigitalLibraryScreen({super.key});
 
@@ -33,9 +36,13 @@ class _DigitalLibraryScreenState extends State<DigitalLibraryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Digital Library'),
+        backgroundColor: pastelBlue,
+        elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(_showFilters ? Icons.filter_list_off : Icons.filter_list),
+            icon: Icon(
+              _showFilters ? Icons.filter_list_off : Icons.filter_list,
+            ),
             onPressed: () {
               setState(() {
                 _showFilters = !_showFilters;
@@ -44,88 +51,107 @@ class _DigitalLibraryScreenState extends State<DigitalLibraryScreen> {
           ),
         ],
       ),
-      body: Consumer<LibraryProvider>(
-        builder: (context, libraryProvider, child) {
-          if (libraryProvider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [pastelBlue, pastelPink],
+          ),
+        ),
+        child: Consumer<LibraryProvider>(
+          builder: (context, libraryProvider, child) {
+            if (libraryProvider.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          return Column(
-            children: [
-              // Search Bar
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search books, authors, or topics...',
-                    prefixIcon: const Icon(Icons.search),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear),
-                            onPressed: () {
-                              _searchController.clear();
-                              libraryProvider.setSearchQuery('');
-                            },
-                          )
-                        : null,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+            return Column(
+              children: [
+                // Search Bar
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search books, authors, or topics...',
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: _searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                _searchController.clear();
+                                libraryProvider.setSearchQuery('');
+                              },
+                            )
+                          : null,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
+                    onChanged: libraryProvider.setSearchQuery,
                   ),
-                  onChanged: libraryProvider.setSearchQuery,
                 ),
-              ),
 
-              // Filters Panel
-              if (_showFilters) _buildFiltersPanel(libraryProvider),
+                // Filters Panel
+                if (_showFilters) _buildFiltersPanel(libraryProvider),
 
-              // Results Header
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '${libraryProvider.libraryItems.length} items',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    DropdownButton<String>(
-                      value: libraryProvider.sortBy,
-                      items: const [
-                        DropdownMenuItem(value: 'title', child: Text('Title')),
-                        DropdownMenuItem(value: 'author', child: Text('Author')),
-                        DropdownMenuItem(value: 'date', child: Text('Date Added')),
-                        DropdownMenuItem(value: 'progress', child: Text('Progress')),
-                      ],
-                      onChanged: (value) {
-                        if (value != null) {
-                          libraryProvider.setSortBy(value);
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ),
-
-              // Library Items List
-              Expanded(
-                child: libraryProvider.libraryItems.isEmpty
-                    ? const Center(
-                        child: Text('No items found'),
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: libraryProvider.libraryItems.length,
-                        itemBuilder: (context, index) {
-                          final item = libraryProvider.libraryItems[index];
-                          return _buildLibraryItemCard(item, libraryProvider);
+                // Results Header
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${libraryProvider.libraryItems.length} items',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      DropdownButton<String>(
+                        value: libraryProvider.sortBy,
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'title',
+                            child: Text('Title'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'author',
+                            child: Text('Author'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'date',
+                            child: Text('Date Added'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'progress',
+                            child: Text('Progress'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          if (value != null) {
+                            libraryProvider.setSortBy(value);
+                          }
                         },
                       ),
-              ),
-            ],
-          );
-        },
+                    ],
+                  ),
+                ),
+
+                // Library Items List
+                Expanded(
+                  child: libraryProvider.libraryItems.isEmpty
+                      ? const Center(child: Text('No items found'))
+                      : ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: libraryProvider.libraryItems.length,
+                          itemBuilder: (context, index) {
+                            final item = libraryProvider.libraryItems[index];
+                            return _buildLibraryItemCard(item, libraryProvider);
+                          },
+                        ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -135,8 +161,17 @@ class _DigitalLibraryScreenState extends State<DigitalLibraryScreen> {
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        gradient: LinearGradient(
+          colors: [Colors.white.withAlpha(230), Colors.white.withAlpha(180)],
+        ),
         borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: pastelBlue.withAlpha(50),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,17 +196,21 @@ class _DigitalLibraryScreenState extends State<DigitalLibraryScreen> {
               FilterChip(
                 label: const Text('E-book'),
                 selected: libraryProvider.selectedType == LibraryItemType.ebook,
-                onSelected: (_) => libraryProvider.setSelectedType(LibraryItemType.ebook),
+                onSelected: (_) =>
+                    libraryProvider.setSelectedType(LibraryItemType.ebook),
               ),
               FilterChip(
                 label: const Text('Audio'),
                 selected: libraryProvider.selectedType == LibraryItemType.audio,
-                onSelected: (_) => libraryProvider.setSelectedType(LibraryItemType.audio),
+                onSelected: (_) =>
+                    libraryProvider.setSelectedType(LibraryItemType.audio),
               ),
               FilterChip(
                 label: const Text('Document'),
-                selected: libraryProvider.selectedType == LibraryItemType.document,
-                onSelected: (_) => libraryProvider.setSelectedType(LibraryItemType.document),
+                selected:
+                    libraryProvider.selectedType == LibraryItemType.document,
+                onSelected: (_) =>
+                    libraryProvider.setSelectedType(LibraryItemType.document),
               ),
             ],
           ),
@@ -179,12 +218,17 @@ class _DigitalLibraryScreenState extends State<DigitalLibraryScreen> {
           const SizedBox(height: 16),
 
           // Category Filter
-          const Text('Categories:', style: TextStyle(fontWeight: FontWeight.w500)),
+          const Text(
+            'Categories:',
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
             children: libraryProvider.categories.map((category) {
-              final isSelected = libraryProvider.selectedCategories.contains(category);
+              final isSelected = libraryProvider.selectedCategories.contains(
+                category,
+              );
               return FilterChip(
                 label: Text(category),
                 selected: isSelected,
@@ -205,9 +249,25 @@ class _DigitalLibraryScreenState extends State<DigitalLibraryScreen> {
     );
   }
 
-  Widget _buildLibraryItemCard(LibraryItem item, LibraryProvider libraryProvider) {
-    return Card(
+  Widget _buildLibraryItemCard(
+    LibraryItem item,
+    LibraryProvider libraryProvider,
+  ) {
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.white.withAlpha(220), Colors.white.withAlpha(160)],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: pastelBlue.withAlpha(40),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
       child: InkWell(
         onTap: () => _showItemDetails(context, item, libraryProvider),
         child: Padding(
@@ -260,10 +320,13 @@ class _DigitalLibraryScreenState extends State<DigitalLibraryScreen> {
                         ),
                         IconButton(
                           icon: Icon(
-                            item.isFavorite ? Icons.favorite : Icons.favorite_border,
+                            item.isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_border,
                             color: item.isFavorite ? Colors.red : Colors.grey,
                           ),
-                          onPressed: () => libraryProvider.toggleFavorite(item.id),
+                          onPressed: () =>
+                              libraryProvider.toggleFavorite(item.id),
                         ),
                       ],
                     ),
@@ -281,16 +344,13 @@ class _DigitalLibraryScreenState extends State<DigitalLibraryScreen> {
                         value: item.progressPercentage / 100,
                         backgroundColor: Colors.grey[300],
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          item.isCompleted ? Colors.green : Colors.blue,
+                          item.isCompleted ? pastelPink : pastelBlue,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         '${item.progressPercentage.toStringAsFixed(1)}% complete',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                     ],
 
@@ -343,7 +403,11 @@ class _DigitalLibraryScreenState extends State<DigitalLibraryScreen> {
     }
   }
 
-  void _showItemDetails(BuildContext context, LibraryItem item, LibraryProvider libraryProvider) {
+  void _showItemDetails(
+    BuildContext context,
+    LibraryItem item,
+    LibraryProvider libraryProvider,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -352,6 +416,16 @@ class _DigitalLibraryScreenState extends State<DigitalLibraryScreen> {
         initialChildSize: 0.7,
         maxChildSize: 0.9,
         builder: (context, scrollController) => Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.white.withAlpha(240),
+                Colors.white.withAlpha(200),
+              ],
+            ),
+          ),
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -410,18 +484,25 @@ class _DigitalLibraryScreenState extends State<DigitalLibraryScreen> {
                           children: [
                             IconButton(
                               icon: Icon(
-                                item.isFavorite ? Icons.favorite : Icons.favorite_border,
-                                color: item.isFavorite ? Colors.red : Colors.grey,
+                                item.isFavorite
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                color: item.isFavorite
+                                    ? Colors.red
+                                    : Colors.grey,
                               ),
                               onPressed: () {
                                 libraryProvider.toggleFavorite(item.id);
-                                Navigator.of(context).pop(); // Close and reopen to refresh
+                                Navigator.of(
+                                  context,
+                                ).pop(); // Close and reopen to refresh
                               },
                             ),
                             const SizedBox(width: 16),
                             Expanded(
                               child: ElevatedButton(
-                                onPressed: () => _openItem(context, item, libraryProvider),
+                                onPressed: () =>
+                                    _openItem(context, item, libraryProvider),
                                 child: const Text('Open'),
                               ),
                             ),
@@ -445,7 +526,7 @@ class _DigitalLibraryScreenState extends State<DigitalLibraryScreen> {
                 value: item.progressPercentage / 100,
                 backgroundColor: Colors.grey[300],
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  item.isCompleted ? Colors.green : Colors.blue,
+                  item.isCompleted ? pastelPink : pastelBlue,
                 ),
               ),
               const SizedBox(height: 4),
@@ -471,7 +552,9 @@ class _DigitalLibraryScreenState extends State<DigitalLibraryScreen> {
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
-                children: item.categories.map((category) => Chip(label: Text(category))).toList(),
+                children: item.categories
+                    .map((category) => Chip(label: Text(category)))
+                    .toList(),
               ),
             ],
           ),
@@ -480,7 +563,11 @@ class _DigitalLibraryScreenState extends State<DigitalLibraryScreen> {
     );
   }
 
-  void _openItem(BuildContext context, LibraryItem item, LibraryProvider libraryProvider) {
+  void _openItem(
+    BuildContext context,
+    LibraryItem item,
+    LibraryProvider libraryProvider,
+  ) {
     // In a real app, this would open the actual content
     // For now, show a simple progress update dialog
     showDialog(
@@ -490,7 +577,9 @@ class _DigitalLibraryScreenState extends State<DigitalLibraryScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Current progress: ${item.progressPercentage.toStringAsFixed(1)}%'),
+            Text(
+              'Current progress: ${item.progressPercentage.toStringAsFixed(1)}%',
+            ),
             const SizedBox(height: 16),
             const Text('Update your reading progress:'),
             const SizedBox(height: 8),
