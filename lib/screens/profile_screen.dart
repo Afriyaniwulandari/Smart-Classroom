@@ -44,9 +44,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadNotificationSettings() async {
-    final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
-    _notificationsEnabled = await notificationProvider.areNotificationsEnabled();
-    _notificationSettings = await notificationProvider.getNotificationSettings();
+    final notificationProvider = Provider.of<NotificationProvider>(
+      context,
+      listen: false,
+    );
+    _notificationsEnabled = await notificationProvider
+        .areNotificationsEnabled();
+    _notificationSettings = await notificationProvider
+        .getNotificationSettings();
     setState(() {});
   }
 
@@ -56,19 +61,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = authProvider.user;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('User not found')),
-      );
+      return const Scaffold(body: Center(child: Text('User not found')));
     }
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: _saveProfile,
-          ),
+          IconButton(icon: const Icon(Icons.save), onPressed: _saveProfile),
         ],
       ),
       body: SingleChildScrollView(
@@ -90,45 +90,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       : null,
                 ),
               ),
-              const SizedBox(height: 16),
-              // Email verification status
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: user.isEmailVerified ? Colors.green[100] : Colors.orange[100],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      user.isEmailVerified ? Icons.verified : Icons.warning,
-                      color: user.isEmailVerified ? Colors.green : Colors.orange,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      user.isEmailVerified ? 'Email Verified' : 'Email Not Verified',
-                      style: TextStyle(
-                        color: user.isEmailVerified ? Colors.green[800] : Colors.orange[800],
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    if (!user.isEmailVerified) ...[
-                      const SizedBox(width: 8),
-                      TextButton(
-                        onPressed: () async {
-                          final success = await Provider.of<AuthProvider>(context, listen: false).sendVerificationEmail();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(success ? 'Verification email sent' : 'Failed to send email')),
-                          );
-                        },
-                        child: const Text('Send Verification'),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
@@ -207,37 +168,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               const SizedBox(height: 16),
-              const Text('Interests', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const Text(
+                'Interests',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
               Wrap(
                 spacing: 8.0,
-                children: [
-                  'Mathematics',
-                  'Science',
-                  'History',
-                  'English',
-                  'Art',
-                  'Music',
-                  'Sports',
-                  'Technology',
-                ].map((interest) {
-                  final isSelected = _interests.contains(interest);
-                  return FilterChip(
-                    label: Text(interest),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      setState(() {
-                        if (selected) {
-                          _interests.add(interest);
-                        } else {
-                          _interests.remove(interest);
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
+                children:
+                    [
+                      'Mathematics',
+                      'Science',
+                      'History',
+                      'English',
+                      'Art',
+                      'Music',
+                      'Sports',
+                      'Technology',
+                    ].map((interest) {
+                      final isSelected = _interests.contains(interest);
+                      return FilterChip(
+                        label: Text(interest),
+                        selected: isSelected,
+                        onSelected: (selected) {
+                          setState(() {
+                            if (selected) {
+                              _interests.add(interest);
+                            } else {
+                              _interests.remove(interest);
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
               ),
               const SizedBox(height: 24),
-              const Text('Notification Settings', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const Text(
+                'Notification Settings',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 16),
               SwitchListTile(
                 title: const Text('Enable Notifications'),
@@ -247,13 +215,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   setState(() {
                     _notificationsEnabled = value;
                   });
-                  final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+                  final notificationProvider =
+                      Provider.of<NotificationProvider>(context, listen: false);
                   await notificationProvider.setNotificationsEnabled(value);
                 },
               ),
               if (_notificationsEnabled) ...[
                 const SizedBox(height: 16),
-                const Text('Notification Types', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const Text(
+                  'Notification Types',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
                 SwitchListTile(
                   title: const Text('Task Deadlines'),
                   subtitle: const Text('Reminders for upcoming task deadlines'),
@@ -262,8 +234,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     setState(() {
                       _notificationSettings['task'] = value;
                     });
-                    final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
-                    await notificationProvider.setNotificationSettings(_notificationSettings);
+                    final notificationProvider =
+                        Provider.of<NotificationProvider>(
+                          context,
+                          listen: false,
+                        );
+                    await notificationProvider.setNotificationSettings(
+                      _notificationSettings,
+                    );
                   },
                 ),
                 SwitchListTile(
@@ -274,8 +252,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     setState(() {
                       _notificationSettings['announcement'] = value;
                     });
-                    final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
-                    await notificationProvider.setNotificationSettings(_notificationSettings);
+                    final notificationProvider =
+                        Provider.of<NotificationProvider>(
+                          context,
+                          listen: false,
+                        );
+                    await notificationProvider.setNotificationSettings(
+                      _notificationSettings,
+                    );
                   },
                 ),
                 SwitchListTile(
@@ -286,8 +270,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     setState(() {
                       _notificationSettings['live_class'] = value;
                     });
-                    final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
-                    await notificationProvider.setNotificationSettings(_notificationSettings);
+                    final notificationProvider =
+                        Provider.of<NotificationProvider>(
+                          context,
+                          listen: false,
+                        );
+                    await notificationProvider.setNotificationSettings(
+                      _notificationSettings,
+                    );
                   },
                 ),
                 SwitchListTile(
@@ -298,8 +288,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     setState(() {
                       _notificationSettings['ai_reminder'] = value;
                     });
-                    final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
-                    await notificationProvider.setNotificationSettings(_notificationSettings);
+                    final notificationProvider =
+                        Provider.of<NotificationProvider>(
+                          context,
+                          listen: false,
+                        );
+                    await notificationProvider.setNotificationSettings(
+                      _notificationSettings,
+                    );
                   },
                 ),
               ],
@@ -318,7 +314,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // In a real app, you would upload the image and get the URL
       // For now, we'll just show a message
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Image selected (upload not implemented)')),
+        const SnackBar(
+          content: Text('Image selected (upload not implemented)'),
+        ),
       );
     }
   }

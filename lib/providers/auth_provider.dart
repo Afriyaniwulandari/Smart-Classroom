@@ -40,7 +40,10 @@ class AuthProvider with ChangeNotifier {
         _token = result['token'];
 
         await _securityService.storeEncryptedData('token', _token!);
-        await _securityService.storeEncryptedData('user', jsonEncode(result['user']));
+        await _securityService.storeEncryptedData(
+          'user',
+          jsonEncode(result['user']),
+        );
 
         _isLoading = false;
         notifyListeners();
@@ -57,7 +60,12 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> register(String email, String password, String name, String role) async {
+  Future<bool> register(
+    String email,
+    String password,
+    String name,
+    String role,
+  ) async {
     _isLoading = true;
     notifyListeners();
 
@@ -68,7 +76,10 @@ class AuthProvider with ChangeNotifier {
         _token = result['token'];
 
         await _securityService.storeEncryptedData('token', _token!);
-        await _securityService.storeEncryptedData('user', jsonEncode(result['user']));
+        await _securityService.storeEncryptedData(
+          'user',
+          jsonEncode(result['user']),
+        );
 
         _isLoading = false;
         notifyListeners();
@@ -111,7 +122,10 @@ class AuthProvider with ChangeNotifier {
       if (result['success']) {
         _user = User.fromJson(result['user']);
 
-        await _securityService.storeEncryptedData('user', jsonEncode(result['user']));
+        await _securityService.storeEncryptedData(
+          'user',
+          jsonEncode(result['user']),
+        );
 
         notifyListeners();
         return true;
@@ -133,7 +147,10 @@ class AuthProvider with ChangeNotifier {
         _token = result['token'];
 
         await _securityService.storeEncryptedData('token', _token!);
-        await _securityService.storeEncryptedData('user', jsonEncode(result['user']));
+        await _securityService.storeEncryptedData(
+          'user',
+          jsonEncode(result['user']),
+        );
 
         _isLoading = false;
         notifyListeners();
@@ -161,7 +178,10 @@ class AuthProvider with ChangeNotifier {
         _token = result['token'];
 
         await _securityService.storeEncryptedData('token', _token!);
-        await _securityService.storeEncryptedData('user', jsonEncode(result['user']));
+        await _securityService.storeEncryptedData(
+          'user',
+          jsonEncode(result['user']),
+        );
 
         _isLoading = false;
         notifyListeners();
@@ -178,34 +198,6 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> sendVerificationEmail() async {
-    if (_user == null) return false;
-    try {
-      return await _authService.sendVerificationEmail(_user!.email);
-    } catch (e) {
-      return false;
-    }
-  }
-
-  Future<bool> verifyEmail() async {
-    if (_token == null) return false;
-    try {
-      final success = await _authService.verifyEmail(_token!);
-      if (success && _user != null) {
-        // Update user email verification status
-        final updatedUser = _user!.copyWith(isEmailVerified: true);
-        _user = updatedUser;
-
-        await _securityService.storeEncryptedData('user', jsonEncode(updatedUser.toJson()));
-
-        notifyListeners();
-      }
-      return success;
-    } catch (e) {
-      return false;
-    }
-  }
-
   // Role-based access control helpers
   bool get isStudent => _user?.role == 'student';
   bool get isTeacher => _user?.role == 'teacher';
@@ -218,7 +210,14 @@ class AuthProvider with ChangeNotifier {
       case 'admin':
         return true; // Admins have all permissions
       case 'teacher':
-        return ['create_class', 'edit_class', 'delete_class', 'create_lesson', 'edit_lesson', 'delete_lesson'].contains(permission);
+        return [
+          'create_class',
+          'edit_class',
+          'delete_class',
+          'create_lesson',
+          'edit_lesson',
+          'delete_lesson',
+        ].contains(permission);
       case 'student':
         return ['view_class', 'view_lesson', 'take_quiz'].contains(permission);
       default:

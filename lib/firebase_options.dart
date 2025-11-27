@@ -41,48 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyC4af7VMRZaJuHeF7mVxY4L65CucEAPSoE',
-    appId: '1:324497999858:web:d51470f745ca5266aa8d6b',
-    messagingSenderId: '324497999858',
-    projectId: 'flutter-firebase-app-a7f68',
-    authDomain: 'flutter-firebase-app-a7f68.firebaseapp.com',
-    storageBucket: 'flutter-firebase-app-a7f68.firebasestorage.app',
-    measurementId: 'G-94XYLGDN4R',
+    apiKey: 'AIzaSyDDIhrHfOdh7stl2iyLdUk40mZjT92op6M',
+    appId: '1:725885160754:web:6bc2ada1ef7e1a7625db2b',
+    messagingSenderId: '725885160754',
+    projectId: 'smartclassroom-3c967',
+    authDomain: 'smartclassroom-3c967.firebaseapp.com',
+    storageBucket: 'smartclassroom-3c967.firebasestorage.app',
+    measurementId: 'G-WLYFHKY9KQ',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAgIIz-sPSgexgEV93HOkFwArg18P0rdM0',
-    appId: '1:324497999858:android:96dc125c6fb778bdaa8d6b',
-    messagingSenderId: '324497999858',
-    projectId: 'flutter-firebase-app-a7f68',
-    storageBucket: 'flutter-firebase-app-a7f68.firebasestorage.app',
+    apiKey: 'AIzaSyAvlif4pGPWkRmwCYwNIRcLXG1x9HqER-I',
+    appId: '1:725885160754:android:8c31e892cd656cc625db2b',
+    messagingSenderId: '725885160754',
+    projectId: 'smartclassroom-3c967',
+    storageBucket: 'smartclassroom-3c967.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyARUnTKneTIPQKxV6SyLisWuiW9gz6e08Y',
-    appId: '1:324497999858:ios:19681cb0fb6fe3c4aa8d6b',
-    messagingSenderId: '324497999858',
-    projectId: 'flutter-firebase-app-a7f68',
-    storageBucket: 'flutter-firebase-app-a7f68.firebasestorage.app',
+    apiKey: 'AIzaSyAOaAz42vPWoSDCWxTIX5fGvBouFvZ5TN8',
+    appId: '1:725885160754:ios:9f85f03f07b8f86025db2b',
+    messagingSenderId: '725885160754',
+    projectId: 'smartclassroom-3c967',
+    storageBucket: 'smartclassroom-3c967.firebasestorage.app',
     iosBundleId: 'com.example.smartClassroom',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyARUnTKneTIPQKxV6SyLisWuiW9gz6e08Y',
-    appId: '1:324497999858:ios:19681cb0fb6fe3c4aa8d6b',
-    messagingSenderId: '324497999858',
-    projectId: 'flutter-firebase-app-a7f68',
-    storageBucket: 'flutter-firebase-app-a7f68.firebasestorage.app',
+    apiKey: 'AIzaSyAOaAz42vPWoSDCWxTIX5fGvBouFvZ5TN8',
+    appId: '1:725885160754:ios:9f85f03f07b8f86025db2b',
+    messagingSenderId: '725885160754',
+    projectId: 'smartclassroom-3c967',
+    storageBucket: 'smartclassroom-3c967.firebasestorage.app',
     iosBundleId: 'com.example.smartClassroom',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyC4af7VMRZaJuHeF7mVxY4L65CucEAPSoE',
-    appId: '1:324497999858:web:0484786627752941aa8d6b',
-    messagingSenderId: '324497999858',
-    projectId: 'flutter-firebase-app-a7f68',
-    authDomain: 'flutter-firebase-app-a7f68.firebaseapp.com',
-    storageBucket: 'flutter-firebase-app-a7f68.firebasestorage.app',
-    measurementId: 'G-SVXZ7PJP5N',
+    apiKey: 'AIzaSyDDIhrHfOdh7stl2iyLdUk40mZjT92op6M',
+    appId: '1:725885160754:web:cd842123aafa014125db2b',
+    messagingSenderId: '725885160754',
+    projectId: 'smartclassroom-3c967',
+    authDomain: 'smartclassroom-3c967.firebaseapp.com',
+    storageBucket: 'smartclassroom-3c967.firebasestorage.app',
+    measurementId: 'G-0LE27CHPK1',
   );
+
 }

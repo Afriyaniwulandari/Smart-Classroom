@@ -1,170 +1,95 @@
 // import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:google_sign_in/google_sign_in.dart';
 // import 'package:oauth2/oauth2.dart' as oauth2;
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:google_sign_in/google_sign_in.dart';
 import '../models/user.dart';
 
 class AuthService {
-  static const String baseUrl = 'https://api.smartclassroom.com'; // Replace with actual API URL
+  static const String baseUrl =
+      'https://api.smartclassroom.com'; // Replace with actual API URL
 
-  // final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  // final GoogleSignIn _googleSignIn = GoogleSignIn();
-
-  // Mock data for development
-  final Map<String, Map<String, dynamic>> _mockUsers = {
-    'student@example.com': {
-      'password': 'password123',
-      'user': {
-        'id': '1',
-        'email': 'student@example.com',
-        'name': 'John Student',
-        'role': 'student',
-        'className': 'Class 10A',
-        'interests': ['Mathematics', 'Science'],
-        'createdAt': '2024-01-01T00:00:00.000Z',
-        'isEmailVerified': true,
-      },
-    },
-    'teacher@example.com': {
-      'password': 'password123',
-      'user': {
-        'id': '2',
-        'email': 'teacher@example.com',
-        'name': 'Jane Teacher',
-        'role': 'teacher',
-        'createdAt': '2024-01-01T00:00:00.000Z',
-        'isEmailVerified': true,
-      },
-    },
-  };
+  final firebase_auth.FirebaseAuth _firebaseAuth =
+      firebase_auth.FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   Future<Map<String, dynamic>> login(String email, String password) async {
-    // Simulate API delay
-    await Future.delayed(const Duration(seconds: 1));
-
-    // Mock authentication
-    if (_mockUsers.containsKey(email) && _mockUsers[email]!['password'] == password) {
-      final userData = _mockUsers[email]!['user'];
-      if (userData['isEmailVerified'] == false) {
-        return {'success': false, 'message': 'Please verify your email before logging in'};
-      }
-      return {
-        'success': true,
-        'user': userData,
-        'token': 'mock_jwt_token_${userData['id']}',
-      };
-    }
-
-    // Uncomment below for real API call
-    /*
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/auth/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'password': password}),
-      );
+      final firebase_auth.UserCredential userCredential = await _firebaseAuth
+          .signInWithEmailAndPassword(email: email, password: password);
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return {
-          'success': true,
-          'user': data['user'],
-          'token': data['token'],
+      final firebase_auth.User? firebaseUser = userCredential.user;
+      if (firebaseUser != null) {
+        final userData = {
+          'id': firebaseUser.uid,
+          'email': firebaseUser.email,
+          'name': firebaseUser.displayName ?? '',
+          'role': 'student', // Default role, could be stored in Firestore
+          'createdAt':
+              firebaseUser.metadata.creationTime?.toIso8601String() ??
+              DateTime.now().toIso8601String(),
+          'isEmailVerified': true,
         };
+
+        final token = await firebaseUser.getIdToken();
+
+        return {'success': true, 'user': userData, 'token': token};
       } else {
         return {'success': false, 'message': 'Login failed'};
       }
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      return {'success': false, 'message': _getFirebaseAuthErrorMessage(e)};
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
-    */
-
-    return {'success': false, 'message': 'Invalid credentials'};
   }
 
-  Future<Map<String, dynamic>> register(String email, String password, String name, String role) async {
-    // Simulate API delay
-    await Future.delayed(const Duration(seconds: 1));
-
-    // Mock registration
-    if (_mockUsers.containsKey(email)) {
-      return {'success': false, 'message': 'User already exists'};
-    }
-
-    final newUser = {
-      'id': DateTime.now().millisecondsSinceEpoch.toString(),
-      'email': email,
-      'name': name,
-      'role': role,
-      'createdAt': DateTime.now().toIso8601String(),
-      'isEmailVerified': false,
-    };
-
-    _mockUsers[email] = {
-      'password': password,
-      'user': newUser,
-    };
-
-    return {
-      'success': true,
-      'user': newUser,
-      'token': 'mock_jwt_token_${newUser['id']}',
-    };
-
-    // Uncomment below for real API call
-    /*
+  Future<Map<String, dynamic>> register(
+    String email,
+    String password,
+    String name,
+    String role,
+  ) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/auth/register'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': email,
-          'password': password,
+      final firebase_auth.UserCredential userCredential = await _firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: password);
+
+      final firebase_auth.User? firebaseUser = userCredential.user;
+      if (firebaseUser != null) {
+        // Update display name
+        await firebaseUser.updateDisplayName(name);
+
+        final userData = {
+          'id': firebaseUser.uid,
+          'email': firebaseUser.email,
           'name': name,
           'role': role,
-        }),
-      );
-
-      if (response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-        return {
-          'success': true,
-          'user': data['user'],
-          'token': data['token'],
+          'createdAt':
+              firebaseUser.metadata.creationTime?.toIso8601String() ??
+              DateTime.now().toIso8601String(),
+          'isEmailVerified': true,
         };
+
+        final token = await firebaseUser.getIdToken();
+
+        return {'success': true, 'user': userData, 'token': token};
       } else {
         return {'success': false, 'message': 'Registration failed'};
       }
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      return {'success': false, 'message': _getFirebaseAuthErrorMessage(e)};
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
-    */
   }
 
   Future<bool> resetPassword(String email) async {
-    // Simulate API delay
-    await Future.delayed(const Duration(seconds: 1));
-
-    // Mock reset password - send email if user exists
-    if (_mockUsers.containsKey(email)) {
-      // Simulate sending reset email
-      return true;
-    }
-    return false;
-
-    // Uncomment below for real API call
-    /*
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/auth/reset-password'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email}),
-      );
-
-      return response.statusCode == 200;
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      return true;
     } catch (e) {
       return false;
     }
-    */
   }
 
   Future<Map<String, dynamic>> updateProfile(String token, User user) async {
@@ -173,10 +98,7 @@ class AuthService {
 
     // Mock update profile
     final userData = user.toJson();
-    return {
-      'success': true,
-      'user': userData,
-    };
+    return {'success': true, 'user': userData};
 
     // Uncomment below for real API call
     /*
@@ -206,86 +128,59 @@ class AuthService {
   }
 
   Future<bool> verifyEmail(String token) async {
-    // Simulate API delay
-    await Future.delayed(const Duration(seconds: 1));
-
-    // Mock email verification
-    return true;
-
-    // Uncomment below for real API call
-    /*
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/auth/verify-email'),
-        headers: {'Authorization': 'Bearer $token'},
-      );
-
-      return response.statusCode == 200;
+      final firebase_auth.User? user = _firebaseAuth.currentUser;
+      if (user != null) {
+        await user.reload();
+        final updatedUser = _firebaseAuth.currentUser;
+        return updatedUser?.emailVerified ?? false;
+      }
+      return false;
     } catch (e) {
       return false;
     }
-    */
   }
 
   Future<Map<String, dynamic>> signInWithGoogle() async {
-    // Simulate API delay
-    await Future.delayed(const Duration(seconds: 1));
-
-    // Mock Google SSO
-    final mockUser = {
-      'id': 'google_${DateTime.now().millisecondsSinceEpoch}',
-      'email': 'googleuser@example.com',
-      'name': 'Google User',
-      'role': 'student', // Default role for SSO
-      'createdAt': DateTime.now().toIso8601String(),
-      'isEmailVerified': true, // SSO emails are verified
-    };
-
-    return {
-      'success': true,
-      'user': mockUser,
-      'token': 'mock_google_token_${mockUser['id']}',
-    };
-
-    // Uncomment below for real Google SSO
-    /*
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
         return {'success': false, 'message': 'Google sign in cancelled'};
       }
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final firebase_auth.AuthCredential credential =
+          firebase_auth.GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken,
+            idToken: googleAuth.idToken,
+          );
 
-      final UserCredential userCredential = await _firebaseAuth.signInWithCredential(credential);
-      final User? user = userCredential.user;
+      final firebase_auth.UserCredential userCredential = await _firebaseAuth
+          .signInWithCredential(credential);
+      final firebase_auth.User? user = userCredential.user;
 
       if (user != null) {
         final userData = {
           'id': user.uid,
           'email': user.email,
-          'name': user.displayName,
+          'name': user.displayName ?? googleUser.displayName ?? '',
           'role': 'student', // Default role
           'isEmailVerified': user.emailVerified,
-          'createdAt': DateTime.now().toIso8601String(),
+          'createdAt':
+              user.metadata.creationTime?.toIso8601String() ??
+              DateTime.now().toIso8601String(),
         };
 
-        return {
-          'success': true,
-          'user': userData,
-          'token': await user.getIdToken(),
-        };
+        final token = await user.getIdToken();
+
+        return {'success': true, 'user': userData, 'token': token};
       } else {
         return {'success': false, 'message': 'Google sign in failed'};
       }
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
-    */
   }
 
   Future<Map<String, dynamic>> signInWithMicrosoft() async {
@@ -321,26 +216,27 @@ class AuthService {
     */
   }
 
-  Future<bool> sendVerificationEmail(String email) async {
-    // Simulate API delay
-    await Future.delayed(const Duration(seconds: 1));
+  Future<void> logout() async {
+    await _firebaseAuth.signOut();
+    await _googleSignIn.signOut();
+  }
 
-    // Mock sending verification email
-    return true;
-
-    // Uncomment below for real email sending
-    /*
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/auth/send-verification-email'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email}),
-      );
-
-      return response.statusCode == 200;
-    } catch (e) {
-      return false;
+  String _getFirebaseAuthErrorMessage(firebase_auth.FirebaseAuthException e) {
+    switch (e.code) {
+      case 'user-not-found':
+        return 'No user found with this email.';
+      case 'wrong-password':
+        return 'Wrong password provided.';
+      case 'invalid-email':
+        return 'The email address is not valid.';
+      case 'user-disabled':
+        return 'This user account has been disabled.';
+      case 'too-many-requests':
+        return 'Too many failed login attempts. Please try again later.';
+      case 'operation-not-allowed':
+        return 'Email/password accounts are not enabled.';
+      default:
+        return 'An error occurred during authentication.';
     }
-    */
   }
 }
